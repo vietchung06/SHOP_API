@@ -5,26 +5,36 @@ import com.example.shop_api.repository.ProductRepositoryDemo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-@Repository
-@Primary  // Thêm @Primary → nói cho Spring biết Bean nào được ưu tiên.
-class MySqlProductRepository implements ProductRepositoryDemo {
+@Component
+@Primary
+class EmailSender implements NotificationSender{
 
 	@Override
-	public void save() {
-		System.out.println("Lưu bằng My Sql");
+	public void send(String message) {
+		System.out.println("Gửi email: "+ message);
 	}
 }
-@Repository
-class MemoryProductRepository implements ProductRepositoryDemo {
+@Component
+class Sms implements NotificationSender{
 
 	@Override
-	public void save() {
-		System.out.println("Lưu bằng Memory");
+	public void send(String message) {
+		System.out.println("Gửi Sms: "+ message);
 	}
 }
+@Component
+class PushSender implements NotificationSender{
+
+	@Override
+	public void send(String message) {
+		System.out.println("Gửi push: "+ message);
+	}
+}
+
 
 
 @SpringBootApplication
@@ -34,11 +44,9 @@ public class ShopApiApplication {
 		Product product = Product.builder()
 				.id(1).name("Áo").price(10000).quantity(20)
 				.build(); // → lấy những dữ liệu đã chuẩn bị và tạo ra object Product thật.
-		System.out.println(product.getId());
 		System.out.println(product.getName());
-		System.out.println(product.getPrice());
-		System.out.println(product.getQuantity());
 		SpringApplication.run(ShopApiApplication.class, args);
+
 
 	}
 
