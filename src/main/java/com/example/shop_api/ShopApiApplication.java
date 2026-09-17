@@ -41,10 +41,10 @@ class PushSender implements NotificationSender{
 public class ShopApiApplication {
 
 	public static void main(String[] args) {
-		Product product = Product.builder()
-				.id(1).name("Áo").price(10000).quantity(20)
-				.build(); // → lấy những dữ liệu đã chuẩn bị và tạo ra object Product thật.
-		System.out.println(product.getName());
+//		Product product = Product.builder()
+//				.id(1).name("Áo").price(10000).quantity(20)
+//				.build(); // → lấy những dữ liệu đã chuẩn bị và tạo ra object Product thật.
+//		System.out.println(product.getName());
 		SpringApplication.run(ShopApiApplication.class, args);
 
 
