@@ -1,8 +1,7 @@
 package com.example.shop_api.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.example.shop_api.JPA.entity.ProductStatus;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -16,11 +15,17 @@ import java.math.BigDecimal;
 @Table(name = "products") //→ Chỉ rõ Entity này tương ứng với bảng
 public class Product {
     @Id                   // id là Primary Key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
+    @Column(precision = 48, scale = 2)
     private BigDecimal price;
     private Integer quantity;
-    private Integer category_id;
+    @Column(name = "category_id")
+    private Integer categoryId;
     private String description;
+    private String brand;
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
 
 }

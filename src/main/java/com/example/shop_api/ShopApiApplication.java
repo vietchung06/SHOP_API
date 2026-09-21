@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Component
 @Primary
 class EmailSender implements NotificationSender{
@@ -46,6 +48,16 @@ public class ShopApiApplication {
 //				.build(); // → lấy những dữ liệu đã chuẩn bị và tạo ra object Product thật.
 //		System.out.println(product.getName());
 		SpringApplication.run(ShopApiApplication.class, args);
+
+		double a = 0.1;
+		double b = 0.2;
+
+		System.out.println("double: " + (a + b));
+
+		BigDecimal x = new BigDecimal("0.1");
+		BigDecimal y = new BigDecimal("0.2");
+
+		System.out.println("BigDecimal: " + x.add(y));
 
 
 	}

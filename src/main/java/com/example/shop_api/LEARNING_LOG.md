@@ -35,3 +35,67 @@ không xác định được cấu hình DataSource phù hợp để thiết l�
 java: Không thể biên dịch module 'shop_api' được cấu hình cho mục tiêu JVM 21:
 phiên bản JDK java "17.0.17"hiện đang liên kết với module này không hỗ trợ mục tiêu JVM 21 yêu cầu.
 
+### Buổi 26 — JPA & Hibernate: ORM, Entity đầu tiên
+BẢNG ĐỐI CHIẾU KIỂU JAVA ↔ SQL ↔ ANNOTATION JPA
+
+1. BẢNG PRODUCTS
+
+| Cột         | Kiểu SQL                       | Kiểu Java   | Annotation JPA cần dùng                                      |
+|-------------|---------------------------------|-------------|--------------------------------------------------------------|
+| id          | INT PRIMARY KEY AUTO_INCREMENT  | Integer     | @Id, @GeneratedValue(strategy = GenerationType.IDENTITY)     |
+| name        | VARCHAR(255)                    | String      | @Column(length = 255)                                        |
+| description | VARCHAR(255)                    | String      | @Column(length = 255)                                        |
+| price       | DECIMAL(38,2)                   | BigDecimal  | @Column(precision = 38, scale = 2)                           |
+| quantity    | INT                             | Integer     | Không bắt buộc @Column                                       |
+| category_id | INT                             | Integer     | @Column(name = "category_id")                                |
+
+
+2. BẢNG CUSTOMERS
+
+| Cột   | Kiểu SQL                       | Kiểu Java | Annotation JPA cần dùng                                      |
+|-------|---------------------------------|-----------|--------------------------------------------------------------|
+| id    | INT PRIMARY KEY AUTO_INCREMENT  | Integer   | @Id, @GeneratedValue(strategy = GenerationType.IDENTITY)     |
+| name  | VARCHAR(100) NOT NULL           | String    | @Column(nullable = false, length = 100)                      |
+| email | VARCHAR(200) UNIQUE             | String    | @Column(unique = true, length = 200)                         |
+| sdt   | VARCHAR(20)                     | String    | @Column(length = 20)                                         |
+
+
+3. BẢNG STUDENTS
+
+| Cột   | Kiểu SQL                       | Kiểu Java   | Annotation JPA cần dùng                                      |
+|-------|---------------------------------|-------------|--------------------------------------------------------------|
+| id    | INT PRIMARY KEY AUTO_INCREMENT  | Integer     | @Id, @GeneratedValue(strategy = GenerationType.IDENTITY)     |
+| name  | VARCHAR(100)                    | String      | @Column(length = 100)                                        |
+| score | DECIMAL(3,1)                    | BigDecimal  | @Column(precision = 3, scale = 1)                            |
+
+
+GHI CHÚ
+
+- @Entity: đánh dấu class là Entity để JPA quản lý.
+- @Table(name = "..."): chỉ định tên bảng trong database.
+- @Id: đánh dấu khóa chính (PRIMARY KEY).
+- @GeneratedValue(strategy = GenerationType.IDENTITY): ID do database tự tăng (AUTO_INCREMENT).
+- @Column: cấu hình cột trong database.
+- nullable = false: tương ứng NOT NULL.
+- unique = true: tương ứng UNIQUE.
+- length = 100: tương ứng độ dài VARCHAR(100).
+- precision: tổng số chữ số của DECIMAL.
+- scale: số chữ số sau dấu thập phân.
+- BigDecimal thường dùng với DECIMAL, đặc biệt đối với tiền.
+- Nếu thuộc tính không có cấu hình đặc biệt thì không bắt buộc viết @Column.
+- @Column(name = "category_id"): dùng để ánh xạ tên thuộc tính Java với tên cột SQL khác nhau.
+- category_id sau này khi học quan hệ Entity có thể dùng @ManyToOne và @JoinColumn thay vì lưu Integer trực tiếp.
+
+### BÀi 3
+Hibernate: alter table products add column brand varchar(255)
+Hibernate:
+→ Câu SQL này do Hibernate thực hiện.
+
+alter table products
+→ Thay đổi cấu trúc bảng products.
+
+add column brand
+→ Thêm một cột mới tên là brand.
+
+varchar(255)
+→ Cột brand có kiểu chuỗi, tối đa 255 ký tự.
