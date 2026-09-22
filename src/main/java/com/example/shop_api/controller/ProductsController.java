@@ -16,24 +16,28 @@ public class ProductsController {
     public ProductsController(ProductsService productsService) {
         this.productsService = productsService;
     }
-    @GetMapping("/products")
-    public List<Products> getAll(){
+    @GetMapping("/product")
+    public List<Product> getAll(){
         return productsService.getAll();
     }
-    @GetMapping("/products/{id}")
-    public Products getbyId(@PathVariable int id){
+
+    @GetMapping("/product/{id}")
+    public Product getbyId(@PathVariable Long id){
         return productsService.getbyId(id);
     }
-    @PostMapping("/products")
-    public int create(@RequestBody Products products){
-        return productsService.create(products);
+
+    @PostMapping("/product")
+    public Product create(@RequestBody Product product){
+        return productsService.create(product);
     }
-    @PutMapping("/products/{id}")
-    public Products update(@PathVariable int id,@RequestBody Products products){
-        return productsService.uapdate(id, products);
+
+    @PutMapping("/product/{id}")
+    public Product update(@PathVariable Long id,@RequestBody Product product){
+        return productsService.update(id, product);
     }
-    @DeleteMapping("/products/{id}")
-    public String deletebyId(@PathVariable int id){
+
+    @DeleteMapping("/product/{id}")
+    public String deletebyId(@PathVariable Long id){
         productsService.deletebyId(id);
         return "Đã xóa thành công";
     }

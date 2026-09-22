@@ -1,13 +1,12 @@
 package com.example.shop_api.repository;
 
-import com.example.shop_api.entity.Product;
 import com.example.shop_api.entity.Products;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
 @Repository
-public class InMemoryProductRepository implements ProductRepository {
+public class InMemoryProductRepository implements ProductsRepository {
     private Map<Integer, Products> data =new HashMap<>();
     private  int nextId = 1;
     public InMemoryProductRepository() {

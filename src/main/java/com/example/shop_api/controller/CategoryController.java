@@ -1,6 +1,6 @@
 package com.example.shop_api.controller;
 
-import com.example.shop_api.entity.Category;
+import com.example.shop_api.JPA.entity.CategoryEntity;
 import com.example.shop_api.service.CategoryService;
 import org.springframework.web.bind.annotation.*;
 
@@ -8,30 +8,31 @@ import java.util.List;
 
 @RestController
 public class CategoryController {
-    private final CategoryService categoryService;
+   private final CategoryService categoryService;
 
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
     @GetMapping("/category")
-    public List<Category> findAll(){
+    public List<CategoryEntity> getAll(){
         return categoryService.getAll();
     }
+
     @GetMapping("/category/{id}")
-    public Category findById(@PathVariable int id){
+    public CategoryEntity getById(@PathVariable Long id){
         return categoryService.getById(id);
     }
     @PostMapping("/category")
-    public int create(@RequestBody Category category){
-        return categoryService.create(category);
+    public CategoryEntity create(@RequestBody CategoryEntity categoryEntity){
+        return categoryService.create(categoryEntity);
     }
     @PutMapping("/category/{id}")
-    public Category update(@PathVariable int id, @RequestBody Category category){
-        return categoryService.update(id, category);
+    public CategoryEntity update(@PathVariable Long id, @RequestBody CategoryEntity categoryEntity){
+        return categoryService.update(id, categoryEntity);
     }
     @DeleteMapping("/category/{id}")
-    public String deleteById(@PathVariable int id){
-        categoryService.deleteById(id);
-        return "Xóa thư mục thành công";
+    public String deleteById(@PathVariable Long id){
+         categoryService.deleteById(id);
+         return "Xóa thành công";
     }
 }

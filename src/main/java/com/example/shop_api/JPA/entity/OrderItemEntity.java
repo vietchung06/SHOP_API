@@ -10,11 +10,15 @@ public class OrderItemEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @Column(name = "order_id")
     private Long orderId;
+
     @Column(name = "product_id")
     private Long productId;
+
     private Integer quantity;
+
     @Column(name = "price_at_purchase",precision = 10, scale = 2)
     private BigDecimal priceAtPurchase;
 }

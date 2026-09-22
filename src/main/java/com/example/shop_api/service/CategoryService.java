@@ -1,44 +1,53 @@
 package com.example.shop_api.service;
 
+import com.example.shop_api.JPA.entity.CategoryEntity;
 import com.example.shop_api.entity.Category;
 import com.example.shop_api.exception.CategoryNotFoundException;
+import com.example.shop_api.exception.InvalidCategoryException;
+import com.example.shop_api.exception.InvalidCustomerException;
 import com.example.shop_api.repository.CategoryRepository;
+import com.example.shop_api.repository.CategorysRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class CategoryService {
-    private final CategoryRepository repository;
+  private final CategorysRepository categorysRepository;
 
-    public CategoryService(CategoryRepository repository) {
-        this.repository = repository;
+    public CategoryService(CategorysRepository categorysRepository) {
+        this.categorysRepository = categorysRepository;
     }
-    public List<Category> getAll(){
-        return repository.findAll();
+
+    public List<CategoryEntity> getAll(){
+        return categorysRepository.findAll();
     }
-    public Category getById(int id){
-        return repository.findById(id)
-                .orElseThrow(()-> new CategoryNotFoundException("Không tìm thấy id"));
+    public CategoryEntity getById(Long id){
+      return categorysRepository.findById(id)
+               .orElseThrow(()-> new CategoryNotFoundException("Không tìm thấy danh mục"));
     }
-    public int create(Category category){
-        if (category.getName() == null || category.getName().isBlank()){
-            throw new IllegalArgumentException("Tên không được để trống");
+    public CategoryEntity create(CategoryEntity categoryEntity){
+        if (categoryEntity.getFullName() == null || categoryEntity.getFullName().isBlank()){
+            throw new InvalidCategoryException("Tên không được để trống");
         }
-       return repository.save(category);
-
-
+        return categorysRepository.save(categoryEntity);
     }
-    public Category update(int id, Category category){
-        getById(id);
-        if (category.getName() == null || category.getName().isBlank()){
-            throw new IllegalArgumentException("Tên không được để trống");
+
+    public CategoryEntity update(Long id, CategoryEntity categoryEntity){
+        if (categoryEntity == null){
+            throw new InvalidCategoryException("Không được để trống thông tin khách hàng");
         }
-        repository.update(id,category);
-        return category;
+        CategoryEntity oldCategory = getById(id);
+        if (categoryEntity.getFullName() == null || categoryEntity.getFullName().isBlank()){
+            throw new InvalidCategoryException("Tên không được để trống");
+        }
+        oldCategory.setFullName(categoryEntity.getFullName());
+        oldCategory.setDescription(categoryEntity.getDescription());
+        return categorysRepository.save(oldCategory);
+
     }
-    public void deleteById(int id){
+    public void deleteById(Long id){
         getById(id);
-        repository.deleteById(id);
+         categorysRepository.deleteById(id);
     }
 }

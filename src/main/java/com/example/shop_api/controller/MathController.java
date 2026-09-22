@@ -13,14 +13,17 @@ public class MathController {
     public MathController(MathService mathService) {
         this.mathService = mathService;
     }
+
     @GetMapping("/sum")
     public int sum(@RequestParam int a, @RequestParam int b){
         return mathService.sum(a,b);
     }
+
     @GetMapping("/multiply")
     public int multiply(@RequestParam int a, @RequestParam int b){
         return mathService.multiply(a,b);
     }
+
     @GetMapping("/prime")
     public String isPrime(@RequestParam int n){
         return mathService.isPrime(n);

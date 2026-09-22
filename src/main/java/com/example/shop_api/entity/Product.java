@@ -11,20 +11,28 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 @Entity
 @Table(name = "products") //→ Chỉ rõ Entity này tương ứng với bảng
 public class Product {
     @Id                   // id là Primary Key
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
+
     private String name;
+
     @Column(precision = 48, scale = 2)
     private BigDecimal price;
+
     private Integer quantity;
+
     @Column(name = "category_id")
-    private Integer categoryId;
+    private Long categoryId;
+
     private String description;
+
     private String brand;
+
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
