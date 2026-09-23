@@ -8,6 +8,7 @@ import com.example.shop_api.repository.ProductRepository;
 import com.example.shop_api.repository.ProductsRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -58,5 +59,48 @@ public class ProductsService {
     public void deletebyId(Long id){
         getbyId(id);
         repository.deleteById(id);
+    }
+
+    public List<Product> search(String keyword, BigDecimal minPrice, BigDecimal maxPrice){
+        return repository.findByNameContainingIgnoreCaseAndPriceBetween(keyword, minPrice,maxPrice);
+    }
+
+    public List<Product> searchByName(String keyword){
+        if (keyword == null || keyword.isBlank()){
+            throw new InvalidProductException("Từ khóa không được để trống");
+        }
+        return repository.findByNameContainingIgnoreCase(keyword);
+    }
+    public List<Product> searchByPrice(BigDecimal minPrice, BigDecimal maxPrice){
+        if (minPrice.signum() < 0 || maxPrice.signum() < 0){
+            throw new InvalidProductException("Giá không được âm");
+        }
+        if (minPrice.compareTo(maxPrice) > 0){
+            throw new InvalidProductException("Giá min không được lớn hơn max");
+        }
+        return repository.findByPriceBetween(minPrice,maxPrice);
+    }
+
+    public List<Product> searchByQuantity(Integer threshold){
+        if (threshold < 0){
+            throw new InvalidProductException("Không được âm");
+        }
+        return repository.findByQuantityLessThan(threshold);
+    }
+
+    public List<Product> getTopExpensive(Integer limit){
+        if (limit <= 0 ){
+            throw new InvalidProductException("Limit phải > 0");
+        }
+        return repository.findAllByOrderByPriceDesc(limit).stream()
+                .limit(limit)
+                .toList();
+    }
+
+    public boolean checkName(String name){
+        if (name == null || name.isBlank()){
+            throw new InvalidProductException("Tên không được để trống");
+        }
+        return repository.existsByName(name);
     }
 }

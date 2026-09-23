@@ -28,19 +28,19 @@ public class SeederCategory implements CommandLineRunner {
             repository.saveAll(category);
             System.out.println("Thêm danh mục thành công");
         }
-        System.out.println("Danh sách danh mục");
-        repository.findAll().forEach(System.out::println);
-
-        System.out.println("Danh mục có id = 13");
-        CategoryEntity categoryEntity = repository.findById(13L).orElseThrow(()-> new CategoryNotFoundException("không tìm thấy danh mục"));
-        System.out.println(categoryEntity);
-
-        System.out.println("Danh mục id = 5 có tồn tại ? " + repository.existsById(5L));
-
-        System.out.println("Tổng số danh mục: "+ repository.count());
-
-         repository.deleteById(3L);
-        System.out.println("Xóa thành công");
+//        System.out.println("Danh sách danh mục");
+//        repository.findAll().forEach(System.out::println);
+//
+//        System.out.println("Danh mục có id = 13");
+//        CategoryEntity categoryEntity = repository.findById(13L).orElseThrow(()-> new CategoryNotFoundException("không tìm thấy danh mục"));
+//        System.out.println(categoryEntity);
+//
+//        System.out.println("Danh mục id = 5 có tồn tại ? " + repository.existsById(5L));
+//
+//        System.out.println("Tổng số danh mục: "+ repository.count());
+//
+//         repository.deleteById(3L);
+//        System.out.println("Xóa thành công");
 
     }
 }

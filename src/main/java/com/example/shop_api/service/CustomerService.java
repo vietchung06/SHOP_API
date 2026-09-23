@@ -2,6 +2,7 @@ package com.example.shop_api.service;
 
 import com.example.shop_api.JPA.entity.CustomerEntity;
 import com.example.shop_api.exception.CustomerNotFoundException;
+import com.example.shop_api.exception.DuplicateEmailException;
 import com.example.shop_api.exception.InvalidCustomerException;
 import com.example.shop_api.repository.CustomerRepository;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,9 @@ public class CustomerService {
         }
         if (customerEntity.getEmail() == null || customerEntity.getEmail().isBlank()){
             throw new InvalidCustomerException("Email không được để trống");
+        }
+        if (repository.existsByEmail(customerEntity.getEmail())){
+            throw new DuplicateEmailException("Email không được trùng");
         }
         return repository.save(customerEntity);
     }
