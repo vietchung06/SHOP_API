@@ -1,12 +1,15 @@
 package com.example.shop_api.JPA.entity;
 
+import com.example.shop_api.entity.Product;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor@NoArgsConstructor
-@ToString
 @Entity
 @Table(name = "categories")
 public class CategoryEntity {
@@ -18,4 +21,8 @@ public class CategoryEntity {
     private String fullName;
 
     private String description;
+
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Product> products;
 }

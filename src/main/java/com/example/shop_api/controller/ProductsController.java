@@ -29,8 +29,8 @@ public class ProductsController {
     }
 
     @PostMapping("/product")
-    public Product create(@RequestBody Product product){
-        return productsService.create(product);
+    public Product create(@RequestBody Product product, @RequestParam Long categoryId){
+        return productsService.create(product,categoryId);
     }
 
     @PutMapping("/product/{id}")
@@ -71,5 +71,11 @@ public class ProductsController {
     public boolean checkName(@RequestParam String name){
         return productsService.checkName(name);
     }
+    @GetMapping("categories/{id}/product")
+    public List<Product> getByCategory(@PathVariable Long id){
+        return productsService.getByCategory(id);
+    }
+
+
 
 }

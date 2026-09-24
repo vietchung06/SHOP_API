@@ -1,9 +1,13 @@
 package com.example.shop_api.config;
 
+import com.example.shop_api.JPA.entity.CategoryEntity;
 import com.example.shop_api.JPA.entity.ProductStatus;
 import com.example.shop_api.entity.Product;
 import com.example.shop_api.exception.ProductNotFoundException;
+import com.example.shop_api.repository.CategoryRepository;
+import com.example.shop_api.repository.CategorysRepository;
 import com.example.shop_api.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -11,16 +15,19 @@ import javax.sound.midi.Soundbank;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
+@Transactional
 @Component
 public class DataSeeder implements CommandLineRunner {
     private final ProductRepository repository;
+    private final CategorysRepository categorysRepository;
 
-    public DataSeeder(ProductRepository repository) {
+    public DataSeeder(ProductRepository repository, CategorysRepository categorysRepository) {
         this.repository = repository;
+        this.categorysRepository = categorysRepository;
     }
+
     @Override
-    public void run(String...args){
+    public void run(String... args) {
 //        if(repository.count() == 0){
 //            List<Product> product = List.of(
 //                    // để id = null → database sẽ tự tạo ID Product.
@@ -59,45 +66,82 @@ public class DataSeeder implements CommandLineRunner {
 //        repository.deleteById(1L);
 //        System.out.println("Đã xóa sản phẩm id = 1");
 
-        System.out.println("Tìm tên sp có chứa từ áo");
-        repository.findByNameContaining("áo").forEach(System.out::println);
-
-        System.out.println("Tìm sản phẩm trong khoảng giá 200000 - 500000");
-        repository.findByPriceBetween(new BigDecimal(200000), new BigDecimal(500000))
-                .forEach(System.out::println);
-
-        System.out.println("Sắp xếp sản phẩm theo giá giảm dần");
-        repository.findAllByOrderByPriceDesc().forEach(System.out::println);
-
-        System.out.println("Sản phẩm có quantity < 10");
-        repository.findByQuantityLessThan(10).forEach(System.out::println);
-
-        System.out.println("Tìm sản phẩm theo categoryId = 1");
-        repository.findByCategoryId(1L).forEach(System.out::println);
-
-        System.out.println("Đếm sản phẩm theo categoryId = 5");
-        System.out.println(repository.countByCategoryId(5L));
-
-        System.out.println("Kiểm tra tên sp có tồn tại không");
-        System.out.println(repository.existsByName("Áo Khoác"));
-
-        System.out.println("5 sp có giá cao nhất");
-        repository.findTop5ByOrderByPriceDesc().forEach(System.out::println);
-
-        System.out.println("Sản phẩm có tên Dép");
-        repository.findByName("Dép").forEach(System.out::println);
-
-        System.out.println(" sản phẩm còn hàng trên mức giá 200000");
-        repository.findInStockAbovePrice(new BigDecimal("200000")).forEach(System.out::println);
-
-        System.out.println("tổng giá trị tồn kho "+ repository.getTotleInventoryValue());
-
+//        System.out.println("Tìm tên sp có chứa từ áo");
+//        repository.findByNameContaining("áo").forEach(System.out::println);
+//
+//        System.out.println("Tìm sản phẩm trong khoảng giá 200000 - 500000");
+//        repository.findByPriceBetween(new BigDecimal(200000), new BigDecimal(500000))
+//                .forEach(System.out::println);
+//
+//        System.out.println("Sắp xếp sản phẩm theo giá giảm dần");
+//        repository.findAllByOrderByPriceDesc().forEach(System.out::println);
+//
+//        System.out.println("Sản phẩm có quantity < 10");
+//        repository.findByQuantityLessThan(10).forEach(System.out::println);
+//
+//        System.out.println("Tìm sản phẩm theo categoryId = 1");
+//        repository.findByCategoryId(1L).forEach(System.out::println);
+//
+//        System.out.println("Đếm sản phẩm theo categoryId = 5");
+//        System.out.println(repository.countByCategoryId(5L));
+//
+//        System.out.println("Kiểm tra tên sp có tồn tại không");
+//        System.out.println(repository.existsByName("Áo Khoác"));
+//
+//        System.out.println("5 sp có giá cao nhất");
+//        repository.findTop5ByOrderByPriceDesc().forEach(System.out::println);
+//
+//        System.out.println("Sản phẩm có tên Dép");
+//        repository.findByName("Dép").forEach(System.out::println);
+//
+//        System.out.println(" sản phẩm còn hàng trên mức giá 200000");
+//        repository.findInStockAbovePrice(new BigDecimal("200000")).forEach(System.out::println);
+//
+//        System.out.println("tổng giá trị tồn kho "+ repository.getTotleInventoryValue());
 
 
 //        System.out.println("tìm theo tên danh mục");
-//        repository.findByNameCategoryId("Quần áo").forEach(System.out::println);
+//        List<Product> productByName = repository.findByNameCategoryId("Quần áo");
+//        for (Product productByNameCategory : productByName) {
+//            System.out.println(productByNameCategory.getCategory().getFullName() + "-" + productByNameCategory.getName() + " - " + productByNameCategory.getPrice());
+//        }
+
+        // ==============================
+        // CÁCH 1: BỊ N+1
+        // ==============================
+
+        System.out.println("===== KHÔNG JOIN FETCH =====");
+
+        List<Product> products = repository.findAll();
+
+        for (Product product : products) {
+
+            System.out.println(
+                    product.getName()
+                            + " - "
+                            + product.getCategory().getFullName()
+            );
         }
 
 
+        // ==============================
+        // CÁCH 2: JOIN FETCH
+        // ==============================
+
+        System.out.println("===== CÓ JOIN FETCH =====");
+
+        List<Product> productsWithCategory =
+                repository.findAllWithCategory();
+
+        for (Product product : productsWithCategory) {
+
+            System.out.println(
+                    product.getName()
+                            + " - "
+                            + product.getCategory().getFullName()
+            );
+            }
+        }
     }
+
 

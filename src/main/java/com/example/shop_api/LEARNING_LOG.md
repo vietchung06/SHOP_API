@@ -99,3 +99,63 @@ add column brand
 
 varchar(255)
 → Cột brand có kiểu chuỗi, tối đa 255 ký tự.
+
+### Buổi 29 — Quan hệ OneToMany / ManyToOne
+
+## Bài 6: N+1 Query và JOIN FETCH
+              N+1 Query
+Product có quan hệ @ManyToOne với Category và được để LAZY.
+Khi repository.findAll() chạy:
+- Hibernate thực hiện 1 query để lấy danh sách Product.
+- Khi gọi product.getCategory().getFullName(), Hibernate mới lấy Category.
+- Có thể phát sinh thêm nhiều query SELECT Category.
+- Đây gọi là vấn đề N+1.
+
+### Khắc phục bằng JOIN FETCH
+
+JOIN FETCH giúp lấy Product và Category cùng trong một query.
+Hibernate chỉ cần 1 query JOIN để lấy cả Product và Category,
+không cần SELECT Category nhiều lần như trước.
+
+Kết luận:
+- Không JOIN FETCH: 1 query lấy Product + nhiều query lấy Category.
+- Có JOIN FETCH: lấy Product và Category cùng một query.
+- JOIN FETCH là một cách xử lý vấn đề N+1.
+
+### BÀi 7
+### Vì sao phía @ManyToOne là chủ quan hệ?
+
+Ví dụ Product - Category:
+
+Product:
+
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "category_id")
+private CategoryEntity category;
+
+Category:
+
+@OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+private List<Product> products;
+
+Trong database, khóa ngoại category_id nằm trong bảng products:
+
+products
+--------------------------------
+id | name | category_id
+1  | Áo   | 1
+2  | Quần | 1
+3  | Giày | 2
+
+Vì Product là phía chứa khóa ngoại category_id nên Product là phía chủ quan hệ
+(owning side).
+
+### mappedBy nghĩa là gì?
+Trong Category:
+@OneToMany(mappedBy = "category")
+private List<Product> products;
+mappedBy = "category" có nghĩa là:
+Quan hệ này đã được quản lý bởi field "category" bên Product.
+Tên "category" chính là tên biến Java:
+private CategoryEntity category;
+mappedBy KHÔNG phải tên cột database.

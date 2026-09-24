@@ -6,14 +6,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class TestController {
-    private final OrderService orderService;
 
-    public TestController(OrderService orderService) {
-        this.orderService = orderService;
-    }
-    @GetMapping("/test")
-    public String test(){
-        orderService.createOrder();
-        return "Đã kiểm tra";
-    }
+
+//    public TestController(OrderService orderService) {
+//        this.orderService = orderService;
+//    }
+//    @GetMapping("/test")
+//    public String test(){
+//        orderService.createOrder();
+//        return "Đã kiểm tra";
+//    }
 }

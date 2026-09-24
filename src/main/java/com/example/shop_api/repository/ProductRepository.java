@@ -49,6 +49,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
 
+
+
     //  Viết bằng @Query JPQL
     // sản phẩm còn hàng trên mức giá X
     @Query("""
@@ -64,12 +66,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     """)
     BigDecimal getTotleInventoryValue();
 
-    // tìm theo tên danh mục
-//    @Query("""
-//    SELECT p FROM Product p
-//        JOIN p.category c
-//        ON c.id = p.categoryID
-//        WHERE c.fullName = :name
-//    """)
-//    List<Product> findByNameCategoryId(@Param("name")String name);
+     //tìm theo tên danh mục
+    @Query("""
+    SELECT p FROM Product p
+        JOIN p.category c
+        WHERE c.fullName = :name
+    """)
+    List<Product> findByNameCategoryId(@Param("name")String name);
+    //sử dụng JOIN FETCH
+    @Query("""
+    SELECT p
+    FROM Product p
+    JOIN FETCH p.category
+""")
+    List<Product> findAllWithCategory();
 }

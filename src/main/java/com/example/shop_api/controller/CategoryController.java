@@ -35,4 +35,14 @@ public class CategoryController {
          categoryService.deleteById(id);
          return "Xóa thành công";
     }
+    @GetMapping("/category/product-count")
+    public List<String> getCategoryWithProductCount() {
+        return categoryService.getCategoryWithProductCount();
+    }
+    // chuyển toàn bộ sản phẩm từ danh mục A sang B
+    @PutMapping("category/{from}/move-products/{to}")
+    public String moveProduct(@PathVariable Long from, @PathVariable Long to){
+           categoryService.moveProduct(from,to);
+           return "Chuyển sản phẩm thành công từ danh mục id: "+ from + " sang "+ to;
+    }
 }
