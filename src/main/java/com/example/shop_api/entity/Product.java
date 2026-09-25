@@ -1,11 +1,14 @@
 package com.example.shop_api.entity;
 
 import com.example.shop_api.JPA.entity.CategoryEntity;
+import com.example.shop_api.JPA.entity.OrderItemEntity;
 import com.example.shop_api.JPA.entity.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,6 +39,10 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
+
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<OrderItemEntity> orderItemEntityList;
 
 
 }

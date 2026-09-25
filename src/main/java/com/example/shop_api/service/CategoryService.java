@@ -10,6 +10,7 @@ import com.example.shop_api.exception.InvalidCustomerException;
 import com.example.shop_api.repository.CategoryRepository;
 import com.example.shop_api.repository.CategorysRepository;
 import com.example.shop_api.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -78,6 +79,7 @@ public class CategoryService {
         return result;
         }
     //chuyển toàn bộ sản phẩm từ danh mục A sang B
+    @Transactional
       public void moveProduct(Long from, Long to){
           CategoryEntity categoryFrom = categorysRepository.findById(from)
                   .orElseThrow(()-> new CategoryNotFoundException("Không tìm thấy danh mục muốn lấy: "+ from));

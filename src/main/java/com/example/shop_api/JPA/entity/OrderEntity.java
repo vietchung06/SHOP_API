@@ -1,5 +1,6 @@
 package com.example.shop_api.JPA.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
+
 @AllArgsConstructor@NoArgsConstructor
 @Getter@Setter
 @Entity
@@ -14,7 +17,7 @@ import java.time.LocalDate;
 public class OrderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn (name = "customer_id")
@@ -26,4 +29,14 @@ public class OrderEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false)
     private OrderStatus orderStatus;
+
+    @OneToMany(
+            mappedBy = "order",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+
+
+    private List<OrderItemEntity> orderItemEntities;
+
 }
