@@ -2,8 +2,12 @@ package com.example.shop_api.controller;
 
 import com.example.shop_api.JPA.entity.CategoryEntity;
 import com.example.shop_api.JPA.entity.CustomerEntity;
+import com.example.shop_api.dto.CustomerRequest;
+import com.example.shop_api.dto.CustomerResponse;
 import com.example.shop_api.repository.CustomerRepository;
 import com.example.shop_api.service.CustomerService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,25 +19,28 @@ public class CustomerController {
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
     }
-    @GetMapping("/customer")
-    public List<CustomerEntity> getAll(){
-        return customerService.getAll();
+    @GetMapping("/customers")
+    public ResponseEntity<List<CustomerResponse>> getAll(){
+        List<CustomerResponse> customer = customerService.getAll();
+        return ResponseEntity.ok(customer);
     }
-    @GetMapping("/customer/{id}")
-    public CustomerEntity getById(@PathVariable Long id){
-        return customerService.getById(id);
+    @GetMapping("/customers/{id}")
+    public ResponseEntity<CustomerResponse> getById(@PathVariable Long id){
+        CustomerResponse customer = customerService.getById(id);
+        return ResponseEntity.ok(customer);
     }
-    @PostMapping("/customer")
-    public CustomerEntity create(@RequestBody CustomerEntity customerEntity){
-        return customerService.create(customerEntity);
+    @PostMapping("/customers")
+    public ResponseEntity<CustomerResponse> create(@RequestBody CustomerRequest request){
+        CustomerResponse customer = customerService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(customer);
     }
-    @PutMapping("/customer/{id}")
-    public CustomerEntity update(@PathVariable Long id, @RequestBody CustomerEntity customerEntity){
-        return customerService.update(id, customerEntity);
+    @PutMapping("/customers/{id}")
+    public CustomerResponse update(@PathVariable Long id, @RequestBody CustomerRequest request){
+        return customerService.update(id, request);
     }
-    @DeleteMapping("/customer/{id}")
-    public String deleteById(@PathVariable Long id){
-         customerService.getById(id);
-         return "Xóa thành công";
+    @DeleteMapping("/customers/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id){
+         customerService.deleteById(id);
+         return ResponseEntity.noContent().build();
     }
 }

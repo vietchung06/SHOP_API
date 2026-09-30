@@ -1,7 +1,11 @@
 package com.example.shop_api.controller;
 
 import com.example.shop_api.JPA.entity.CategoryEntity;
+import com.example.shop_api.dto.CategoryRequest;
+import com.example.shop_api.dto.CategoryResponse;
 import com.example.shop_api.service.CategoryService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,36 +17,41 @@ public class CategoryController {
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
-    @GetMapping("/category")
-    public List<CategoryEntity> getAll(){
-        return categoryService.getAll();
+    @GetMapping("/categories")
+    public ResponseEntity<List<CategoryResponse>> getAll(){
+        List<CategoryResponse> category =  categoryService.getAll();
+        return ResponseEntity.ok(category);
     }
 
-    @GetMapping("/category/{id}")
-    public CategoryEntity getById(@PathVariable Long id){
-        return categoryService.getById(id);
+    @GetMapping("/categories/{id}")
+    public ResponseEntity<CategoryResponse> getById(@PathVariable Long id){
+        CategoryResponse category =  categoryService.getById(id);
+        return ResponseEntity.ok(category);
     }
-    @PostMapping("/category")
-    public CategoryEntity create(@RequestBody CategoryEntity categoryEntity){
-        return categoryService.create(categoryEntity);
+    @PostMapping("/categories")
+    public ResponseEntity<CategoryResponse> create(@RequestBody CategoryRequest request){
+        CategoryResponse category = categoryService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
-    @PutMapping("/category/{id}")
-    public CategoryEntity update(@PathVariable Long id, @RequestBody CategoryEntity categoryEntity){
-        return categoryService.update(id, categoryEntity);
+    @PutMapping("/categories/{id}")
+    public ResponseEntity<CategoryResponse> update(@PathVariable Long id, @RequestBody CategoryRequest request){
+        CategoryResponse category = categoryService.update(id, request);
+        return ResponseEntity.ok(category);
     }
-    @DeleteMapping("/category/{id}")
-    public String deleteById(@PathVariable Long id){
+    @DeleteMapping("/categories/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id){
          categoryService.deleteById(id);
-         return "Xóa thành công";
+         return ResponseEntity.noContent().build();
     }
-    @GetMapping("/category/product-count")
-    public List<String> getCategoryWithProductCount() {
-        return categoryService.getCategoryWithProductCount();
+    @GetMapping("/categories/product-count")
+    public ResponseEntity<List<String>> getCategoryWithProductCount() {
+        List<String> result =  categoryService.getCategoryWithProductCount();
+        return ResponseEntity.ok(result);
     }
     // chuyển toàn bộ sản phẩm từ danh mục A sang B
-    @PutMapping("category/{from}/move-products/{to}")
-    public String moveProduct(@PathVariable Long from, @PathVariable Long to){
+    @PutMapping("/categories/{from}/move-products/{to}")
+    public ResponseEntity<String> moveProduct(@PathVariable Long from, @PathVariable Long to){
            categoryService.moveProduct(from,to);
-           return "Chuyển sản phẩm thành công từ danh mục id: "+ from + " sang "+ to;
+           return ResponseEntity.ok("Chuyển sản phẩm thành công từ danh mục id: "+ from + " sang "+ to);
     }
 }

@@ -35,7 +35,7 @@ public class OrderEntity {
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true)
-
+     @JsonIgnore
 
     private List<OrderItemEntity> orderItemEntities;
 

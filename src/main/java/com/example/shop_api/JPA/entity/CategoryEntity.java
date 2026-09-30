@@ -23,6 +23,6 @@ public class CategoryEntity {
     private String description;
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    @JsonIgnore
+
     private List<Product> products;
 }

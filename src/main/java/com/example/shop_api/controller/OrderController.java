@@ -1,11 +1,17 @@
 package com.example.shop_api.controller;
 
 import com.example.shop_api.JPA.entity.OrderEntity;
+import com.example.shop_api.dto.OrderRequest;
+import com.example.shop_api.dto.OrderResponse;
 import com.example.shop_api.service.OrderService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
+
 
 @RestController
 public class OrderController {
@@ -14,27 +20,38 @@ public class OrderController {
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
+    @GetMapping("/orders")
+    public ResponseEntity<List<OrderResponse>> getAll(){
+        List<OrderResponse> order = orderService.getAll();
+        return ResponseEntity.ok(order);
+    }
     //lấy đơn hàng của một khách
-    @GetMapping("/customer/{id}/order")
-    public List<OrderEntity> getByCustomer(@PathVariable Long id){
-        return orderService.getByCustomer(id);
+    @GetMapping("/customers/{id}/orders")
+    public ResponseEntity<List<OrderEntity>> getByCustomer(@PathVariable Long id){
+        List<OrderEntity> orders =  orderService.getByCustomer(id);
+        return ResponseEntity.ok(orders);
+    }
+    //lấy đơn theo id
+    @GetMapping("/orders/{id}")
+    public ResponseEntity<OrderResponse> getById(@PathVariable Long id){
+        OrderResponse response = orderService.getById(id);
+        return ResponseEntity.ok(response);
     }
     //Tạo đơn hàng mới
-    @PostMapping("/order")
-    public OrderEntity createOrder(@RequestParam Long customerId, @RequestBody Map<Long,Integer> productQuantities){
+    @PostMapping("/orders")
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request){
 
-        return orderService.createOrder(customerId,productQuantities);
+        OrderResponse response = orderService.createOrder(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     // trả đơn kèm danh sách item
-    @GetMapping("/order/{id}")
-    public OrderEntity getOrderDetail(@PathVariable Long id) {
-        return orderService.getOrderDetail(id);
-    }
-    @GetMapping("/orders/{id}")
-    public OrderEntity getOrdersDetail(@PathVariable Long id) {
-        return orderService.getOrdersDetail(id);
-    }
-    @PutMapping("/order/{id}/cancel")
+//    @GetMapping("/orders/{id}")
+//    public ResponseEntity<OrderEntity> getOrderDetail(@PathVariable Long id) {
+//        OrderEntity order = orderService.getOrderDetail(id);
+//        return ResponseEntity.ok(order);
+//    }
+
+    @PutMapping("/orders/{id}/cancel")
     public OrderEntity cancelOrder(@PathVariable Long id){
         return orderService.cancelOrder(id);
     }

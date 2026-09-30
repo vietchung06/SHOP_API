@@ -5,11 +5,16 @@ import com.example.shop_api.JPA.entity.OrderEntity;
 import com.example.shop_api.JPA.entity.OrderItemEntity;
 import com.example.shop_api.JPA.entity.OrderStatus;
 import com.example.shop_api.NotificationSender;
+import com.example.shop_api.dto.OrderItemRequest;
+import com.example.shop_api.dto.OrderItemResponse;
+import com.example.shop_api.dto.OrderRequest;
+import com.example.shop_api.dto.OrderResponse;
 import com.example.shop_api.entity.Product;
 import com.example.shop_api.exception.CustomerNotFoundException;
 import com.example.shop_api.exception.InsufficientStockException;
 import com.example.shop_api.exception.OrderNotFoundException;
 import com.example.shop_api.exception.ProductNotFoundException;
+import com.example.shop_api.mapper.OrderMapper;
 import com.example.shop_api.repository.CustomerRepository;
 import com.example.shop_api.repository.OrderRepository;
 import com.example.shop_api.repository.ProductRepository;
@@ -28,49 +33,83 @@ public class OrderService {
     private final OrderRepository repository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
+    private final OrderMapper orderMapper;
 
-    public OrderService(OrderRepository repository, CustomerRepository customerRepository, ProductRepository productRepository) {
+    public OrderService(OrderRepository repository, CustomerRepository customerRepository, ProductRepository productRepository, OrderMapper orderMapper) {
         this.repository = repository;
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
+        this.orderMapper = orderMapper;
+    }
+
+    public List<OrderResponse> getAll(){
+        List<OrderEntity> order = repository.findAll();
+        List<OrderResponse> result = new ArrayList<>();
+        for (OrderEntity order1 : order){
+            result.add(orderMapper.toResponse(order1));
+        }
+        return result;
     }
 
     //  //Tìm đơn hàng theo id khách hàng
     public List<OrderEntity> getByCustomer(Long customerId) {
         return repository.findByCustomerId(customerId);
     }
+    public OrderResponse getById(Long id) {
+
+        OrderEntity order = repository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Không tìm thấy order id: " + id
+                        ));
+
+        return orderMapper.toResponse(order);
+    }
 
     @Transactional
-    public OrderEntity createOrder(Long customerId, Map<Long, Integer> productQuantities) {
-        CustomerEntity customer = customerRepository.findById(customerId)
+    public OrderResponse createOrder(OrderRequest request) {
+
+        System.out.println("customerId = " + request.customerId());
+
+        for (OrderItemRequest item : request.items()) {
+            System.out.println("productId = " + item.productId());
+            System.out.println("quantity = " + item.quantity());
+        }
+        CustomerEntity customer = customerRepository.findById(request.customerId())
                 .orElseThrow(() -> new CustomerNotFoundException("Không tìm thấy khách hàng"));
 
         //tạo đơn hàng mới
-        OrderEntity order = new OrderEntity(null, customer, LocalDate.now(), OrderStatus.CANCELLED, new ArrayList<>());
+        OrderEntity order = new OrderEntity();
+
+        order.setCustomer(customer);
+        order.setOrderDate(LocalDate.now());
+        order.setOrderStatus(OrderStatus.CANCELLED);
+        order.setOrderItemEntities(new ArrayList<>());
 
         List<OrderItemEntity> items = new ArrayList<>();
-        for (Map.Entry<Long, Integer> entry : productQuantities.entrySet()) {
-            Long productId = entry.getKey();
-            Integer productQuantity = entry.getValue();
-            Product product = productRepository.findById(productId)
+        //xử lý từng sản phẩm
+        for (OrderItemRequest itemRequest : request.items()) {
+            Product product = productRepository.findById(itemRequest.productId())
                     .orElseThrow(() -> new ProductNotFoundException("Không tìm thấy sản phẩm"));
-            if (product.getQuantity() < productQuantity) {
+            if (product.getQuantity() < itemRequest.quantity()) {
                 throw new InsufficientStockException("Sản phẩm không đủ hàng");
 
             }
+            //trừ tồn kho
+            product.setQuantity(product.getQuantity() - itemRequest.quantity());
+            productRepository.save(product);
             //giá hiện tại
             BigDecimal priceAtPurchase = product.getPrice();
             //tạo orderItem mới
-            OrderItemEntity orderItem = new OrderItemEntity(null, order, product, productQuantity, priceAtPurchase);
+            OrderItemEntity orderItem = new OrderItemEntity(null, order, product, itemRequest.quantity(), priceAtPurchase);
             //thêm vào
             items.add(orderItem);
-            //trừ tồn kho
-            product.setQuantity(product.getQuantity() - productQuantity);
-            productRepository.save(product);
+
         }
             //đưa danh sách orderItem vào order
             order.setOrderItemEntities(items);
-            return repository.save(order);
+        OrderEntity save = repository.save(order);
+            return orderMapper.toResponse(save);
 
         }
 

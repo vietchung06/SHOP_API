@@ -1,68 +1,96 @@
 package com.example.shop_api.service;
 
 import com.example.shop_api.JPA.entity.CategoryEntity;
+import com.example.shop_api.dto.ProductRequest;
+import com.example.shop_api.dto.ProductResponse;
 import com.example.shop_api.entity.Product;
 import com.example.shop_api.entity.Products;
 import com.example.shop_api.exception.CategoryNotFoundException;
 import com.example.shop_api.exception.InvalidProductException;
 import com.example.shop_api.exception.ProductNotFoundException;
+import com.example.shop_api.mapper.ProductMapper;
 import com.example.shop_api.repository.CategorysRepository;
 import com.example.shop_api.repository.ProductRepository;
 import com.example.shop_api.repository.ProductsRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ProductsService {
     private final ProductRepository repository;
     private final CategorysRepository categorysRepository;
+    private final ProductMapper mapper;
 
-    public ProductsService(ProductRepository repository, CategorysRepository categorysRepository) {
+    public ProductsService(ProductRepository repository, CategorysRepository categorysRepository, ProductMapper mapper) {
         this.repository = repository;
         this.categorysRepository = categorysRepository;
+        this.mapper = mapper;
     }
 
-    public List<Product> getAll(){
-        return repository.findAll();
+    public List<ProductResponse> getAll(){
+       List<Product> products = repository.findAll();
+       List<ProductResponse> result = new ArrayList<>();
+       for (Product product : products){
+           result.add(mapper.toResponse(product));
+       }
+       return result;
     }
 
-    public Product getbyId(Long id){
-        return repository.findById(id)
+    public ProductResponse getbyId(Long id){
+        Product product = repository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Không tìm thấy sản phẩm có id "+ id));
-
+        return mapper.toResponse(product);
     }
-    public Product create(Product product, Long categoryId){
-        if(product.getPrice().signum() < 0){
+    public ProductResponse create(ProductRequest request){
+        if(request.price().signum() < 0){
             throw new InvalidProductException("Giá phải lớn hơn 0");
         }
-        if (product.getQuantity() < 0) {
+        if (request.quantity() < 0) {
             throw new InvalidProductException("Số lượng phải >= 0");
         }
 
-        CategoryEntity category = categorysRepository.findById(categoryId)
-                .orElseThrow(()-> new CategoryNotFoundException("Không tìm thấy danh mục id: "+ categoryId));
+        CategoryEntity category = categorysRepository.findById(request.categoryId())
+                .orElseThrow(()-> new CategoryNotFoundException("Không tìm thấy danh mục id: "+ request.categoryId()));
+        Product product = mapper.toEntity(request);
         product.setCategory(category);
-            return repository.save(product);
-
+        Product save = repository.save(product);
+        return mapper.toResponse(save);
     }
 
-    public Product update(Long id, Product product){
-        Product oldProduct = getbyId(id);
+    public ProductResponse update(Long id, ProductRequest request){
+        Product oldProduct = repository.findById(id)
+                .orElseThrow(()-> new ProductNotFoundException("Không tìm thấy sản phẩm"));
 
-        if(product.getPrice().signum() < 0){
+        if(request.price().signum() < 0){
             throw new InvalidProductException("Giá phải lớn hơn 0");
         }
-        if (product.getQuantity() < 0) {
+        if (request.quantity() < 0) {
             throw new InvalidProductException("Số lượng phải >= 0");
         }
-       oldProduct.setCategory(product.getCategory());
-        oldProduct.setName(product.getName());
-        oldProduct.setPrice(product.getPrice());
-        oldProduct.setQuantity(product.getQuantity());
 
-        return repository.save(oldProduct);
+        oldProduct.setName(request.name());
+        oldProduct.setPrice(request.price());
+        oldProduct.setQuantity(request.quantity());
+        oldProduct.setBrand(request.brand());
+        oldProduct.setDescription(request.description());
+        oldProduct.setStatus(request.status());
+        if (request.categoryId() != null){
+            CategoryEntity category = categorysRepository.findById(request.categoryId())
+                    .orElseThrow(()-> new CategoryNotFoundException("Không tìm thấy categoryId"));
+            oldProduct.setCategory(category);
+        }
+        Product save = repository.save(oldProduct);
+        return mapper.toResponse(save);
+    }
+
+    // chỉ sửa quantity
+    public Product updateQuantity(Long id, Integer quantity){
+       Product product =  repository.findById(id).orElseThrow(()-> new ProductNotFoundException("Không tìm thấy sản phẩm"));
+       product.setQuantity(quantity);
+       return repository.save(product);
     }
 
     public void deletebyId(Long id){
