@@ -4,6 +4,7 @@ import com.example.shop_api.JPA.entity.OrderEntity;
 import com.example.shop_api.dto.OrderRequest;
 import com.example.shop_api.dto.OrderResponse;
 import com.example.shop_api.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,7 @@ public class OrderController {
     }
     //Tạo đơn hàng mới
     @PostMapping("/orders")
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request){
+    public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest request){
 
         OrderResponse response = orderService.createOrder(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -52,7 +53,7 @@ public class OrderController {
 //    }
 
     @PutMapping("/orders/{id}/cancel")
-    public OrderEntity cancelOrder(@PathVariable Long id){
+    public OrderResponse cancelOrder(@PathVariable Long id){
         return orderService.cancelOrder(id);
     }
 }

@@ -6,6 +6,7 @@ import com.example.shop_api.dto.CustomerRequest;
 import com.example.shop_api.dto.CustomerResponse;
 import com.example.shop_api.repository.CustomerRepository;
 import com.example.shop_api.service.CustomerService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,12 +31,12 @@ public class CustomerController {
         return ResponseEntity.ok(customer);
     }
     @PostMapping("/customers")
-    public ResponseEntity<CustomerResponse> create(@RequestBody CustomerRequest request){
+    public ResponseEntity<CustomerResponse> create(@Valid @RequestBody CustomerRequest request){
         CustomerResponse customer = customerService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(customer);
     }
     @PutMapping("/customers/{id}")
-    public CustomerResponse update(@PathVariable Long id, @RequestBody CustomerRequest request){
+    public CustomerResponse update(@PathVariable Long id,@Valid @RequestBody CustomerRequest request){
         return customerService.update(id, request);
     }
     @DeleteMapping("/customers/{id}")

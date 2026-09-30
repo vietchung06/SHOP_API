@@ -39,7 +39,7 @@ public class ProductsService {
        return result;
     }
 
-    public ProductResponse getbyId(Long id){
+    public ProductResponse getById(Long id){
         Product product = repository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Không tìm thấy sản phẩm có id "+ id));
         return mapper.toResponse(product);
@@ -87,10 +87,11 @@ public class ProductsService {
     }
 
     // chỉ sửa quantity
-    public Product updateQuantity(Long id, Integer quantity){
+    public ProductResponse updateQuantity(Long id, Integer quantity){
        Product product =  repository.findById(id).orElseThrow(()-> new ProductNotFoundException("Không tìm thấy sản phẩm"));
        product.setQuantity(quantity);
-       return repository.save(product);
+       Product save = repository.save(product);
+       return mapper.toResponse(save);
     }
 
     public void deletebyId(Long id){
@@ -98,39 +99,52 @@ public class ProductsService {
         repository.deleteById(id);
     }
 
-    public List<Product> search(String keyword, BigDecimal minPrice, BigDecimal maxPrice){
-        return repository.findByNameContainingIgnoreCaseAndPriceBetween(keyword, minPrice,maxPrice);
+    public List<ProductResponse> search(String keyword, BigDecimal minPrice, BigDecimal maxPrice){
+        return repository.findByNameContainingIgnoreCaseAndPriceBetween(keyword, minPrice,maxPrice)
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
-    public List<Product> searchByName(String keyword){
+    public List<ProductResponse> searchByName(String keyword){
         if (keyword == null || keyword.isBlank()){
             throw new InvalidProductException("Từ khóa không được để trống");
         }
-        return repository.findByNameContainingIgnoreCase(keyword);
+        return repository.findByNameContainingIgnoreCase(keyword)
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
-    public List<Product> searchByPrice(BigDecimal minPrice, BigDecimal maxPrice){
+    public List<ProductResponse> searchByPrice(BigDecimal minPrice, BigDecimal maxPrice){
         if (minPrice.signum() < 0 || maxPrice.signum() < 0){
             throw new InvalidProductException("Giá không được âm");
         }
         if (minPrice.compareTo(maxPrice) > 0){
             throw new InvalidProductException("Giá min không được lớn hơn max");
         }
-        return repository.findByPriceBetween(minPrice,maxPrice);
+        return repository.findByPriceBetween(minPrice,maxPrice)
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
-    public List<Product> searchByQuantity(Integer threshold){
+    public List<ProductResponse> searchByQuantity(Integer threshold){
         if (threshold < 0){
             throw new InvalidProductException("Không được âm");
         }
-        return repository.findByQuantityLessThan(threshold);
+        return repository.findByQuantityLessThan(threshold)
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
-    public List<Product> getTopExpensive(Integer limit){
+    public List<ProductResponse> getTopExpensive(Integer limit){
         if (limit <= 0 ){
             throw new InvalidProductException("Limit phải > 0");
         }
         return repository.findAllByOrderByPriceDesc(limit).stream()
                 .limit(limit)
+                .map(mapper::toResponse)
                 .toList();
     }
 
@@ -141,8 +155,11 @@ public class ProductsService {
         return repository.existsByName(name);
     }
 
-    public List<Product> getByCategory(Long categoryId){
-        return repository.findByCategoryId(categoryId);
+    public List<ProductResponse> getByCategory(Long categoryId){
+        return repository.findByCategoryId(categoryId)
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
     //  Đếm sản phẩm theo categoryId
     public Long countByCategoryId(Long categoryId){

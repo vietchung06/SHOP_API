@@ -4,6 +4,7 @@ import com.example.shop_api.JPA.entity.CategoryEntity;
 import com.example.shop_api.dto.CategoryRequest;
 import com.example.shop_api.dto.CategoryResponse;
 import com.example.shop_api.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +30,12 @@ public class CategoryController {
         return ResponseEntity.ok(category);
     }
     @PostMapping("/categories")
-    public ResponseEntity<CategoryResponse> create(@RequestBody CategoryRequest request){
+    public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest request){
         CategoryResponse category = categoryService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
     @PutMapping("/categories/{id}")
-    public ResponseEntity<CategoryResponse> update(@PathVariable Long id, @RequestBody CategoryRequest request){
+    public ResponseEntity<CategoryResponse> update(@PathVariable Long id,@Valid @RequestBody CategoryRequest request){
         CategoryResponse category = categoryService.update(id, request);
         return ResponseEntity.ok(category);
     }

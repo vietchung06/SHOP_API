@@ -137,7 +137,7 @@ public class OrderService {
 
     //nghiệp vụ hủy đơn gồm đổi trạng thái đơn hàng và hoàn lại tồn kho
     @Transactional
-    public OrderEntity cancelOrder(Long orderId){
+    public OrderResponse cancelOrder(Long orderId){
         //lấy đơn hàng theo id
         OrderEntity order = repository.findById(orderId).orElseThrow(()-> new OrderNotFoundException("Khng tìm thấy đơn hàng"));
         //đổi sang trạng thái hủy
@@ -156,7 +156,7 @@ public class OrderService {
         if (count == 1) {
             throw new RuntimeException("Giả lập lỗi");
         }
-        return order;
+        return orderMapper.toResponse(order);
 
     }
 
