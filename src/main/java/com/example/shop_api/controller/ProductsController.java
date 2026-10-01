@@ -48,14 +48,14 @@ public class ProductsController {
     }
     //chỉ sửa tồn kho
     @PatchMapping("/products/{id}/quantity")
-    public ResponseEntity<ProductResponse> updateQuantity(@PathVariable Long id, @RequestBody Integer quantity){
-        ProductResponse product = productsService.updateQuantity(id, quantity);
+    public ResponseEntity<ProductResponse> updateQuantity(@PathVariable Long id,@Valid @RequestBody ProductRequest request){
+        ProductResponse product = productsService.updateQuantity(id, request.quantity());
         return ResponseEntity.ok(product);
     }
 
     @DeleteMapping("/products/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
-        productsService.deletebyId(id);
+        productsService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -97,7 +97,11 @@ public class ProductsController {
         List<ProductResponse> products = productsService.getByCategory(id);
         return ResponseEntity.ok(products);
     }
-
+    @GetMapping("/test-500")
+    public String test500() {
+        productsService.test500();
+        return "OK";
+    }
 
 
 }

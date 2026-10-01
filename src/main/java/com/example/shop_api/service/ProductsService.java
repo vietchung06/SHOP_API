@@ -6,6 +6,7 @@ import com.example.shop_api.dto.ProductResponse;
 import com.example.shop_api.entity.Product;
 import com.example.shop_api.entity.Products;
 import com.example.shop_api.exception.CategoryNotFoundException;
+import com.example.shop_api.exception.DuplicateProductException;
 import com.example.shop_api.exception.InvalidProductException;
 import com.example.shop_api.exception.ProductNotFoundException;
 import com.example.shop_api.mapper.ProductMapper;
@@ -45,11 +46,8 @@ public class ProductsService {
         return mapper.toResponse(product);
     }
     public ProductResponse create(ProductRequest request){
-        if(request.price().signum() < 0){
-            throw new InvalidProductException("Giá phải lớn hơn 0");
-        }
-        if (request.quantity() < 0) {
-            throw new InvalidProductException("Số lượng phải >= 0");
+        if (repository.existsByName(request.name())){
+            throw new DuplicateProductException("Sản phẩm đã tồn tại"+ request.name());
         }
 
         CategoryEntity category = categorysRepository.findById(request.categoryId())
@@ -64,12 +62,7 @@ public class ProductsService {
         Product oldProduct = repository.findById(id)
                 .orElseThrow(()-> new ProductNotFoundException("Không tìm thấy sản phẩm"));
 
-        if(request.price().signum() < 0){
-            throw new InvalidProductException("Giá phải lớn hơn 0");
-        }
-        if (request.quantity() < 0) {
-            throw new InvalidProductException("Số lượng phải >= 0");
-        }
+
 
         oldProduct.setName(request.name());
         oldProduct.setPrice(request.price());
@@ -94,8 +87,8 @@ public class ProductsService {
        return mapper.toResponse(save);
     }
 
-    public void deletebyId(Long id){
-        getbyId(id);
+    public void deleteById(Long id){
+        getById(id);
         repository.deleteById(id);
     }
 
@@ -164,5 +157,11 @@ public class ProductsService {
     //  Đếm sản phẩm theo categoryId
     public Long countByCategoryId(Long categoryId){
         return repository.countByCategoryId(categoryId);
+    }
+    public void test500() {
+        int a = 10;
+        int b = 0;
+
+        int result = a / b;
     }
 }

@@ -51,6 +51,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
 
+
+
     //  Viết bằng @Query JPQL
     // sản phẩm còn hàng trên mức giá X
     @Query("""

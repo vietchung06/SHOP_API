@@ -5,10 +5,7 @@ import com.example.shop_api.dto.CategoryRequest;
 import com.example.shop_api.dto.CategoryResponse;
 import com.example.shop_api.entity.Category;
 import com.example.shop_api.entity.Product;
-import com.example.shop_api.exception.CategoryInUseException;
-import com.example.shop_api.exception.CategoryNotFoundException;
-import com.example.shop_api.exception.InvalidCategoryException;
-import com.example.shop_api.exception.InvalidCustomerException;
+import com.example.shop_api.exception.*;
 import com.example.shop_api.mapper.CategoryMapper;
 import com.example.shop_api.repository.CategoryRepository;
 import com.example.shop_api.repository.CategorysRepository;
@@ -49,6 +46,9 @@ public class CategoryService {
       return mapper.toResponse(category, productCount);
     }
     public CategoryResponse create(CategoryRequest request){
+        if (categorysRepository.existsByFullName(request.fullName())){
+            throw new DuplicateCategoryException("Danh mục đã tồn tại "+ request.fullName());
+        }
         if (request.fullName() == null || request.fullName().isBlank()){
             throw new InvalidCategoryException("Tên không được để trống");
         }
