@@ -1,10 +1,10 @@
 package com.example.shop_api.service;
 
 import com.example.shop_api.JPA.entity.CategoryEntity;
+import com.example.shop_api.dto.PageResponse;
 import com.example.shop_api.dto.ProductRequest;
 import com.example.shop_api.dto.ProductResponse;
 import com.example.shop_api.entity.Product;
-import com.example.shop_api.entity.Products;
 import com.example.shop_api.exception.CategoryNotFoundException;
 import com.example.shop_api.exception.DuplicateProductException;
 import com.example.shop_api.exception.InvalidProductException;
@@ -12,11 +12,11 @@ import com.example.shop_api.exception.ProductNotFoundException;
 import com.example.shop_api.mapper.ProductMapper;
 import com.example.shop_api.repository.CategorysRepository;
 import com.example.shop_api.repository.ProductRepository;
-import com.example.shop_api.repository.ProductsRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,13 +31,28 @@ public class ProductsService {
         this.mapper = mapper;
     }
 
-    public List<ProductResponse> getAll(){
-       List<Product> products = repository.findAll();
-       List<ProductResponse> result = new ArrayList<>();
-       for (Product product : products){
-           result.add(mapper.toResponse(product));
-       }
-       return result;
+    public PageResponse<ProductResponse> getAll(Pageable pageable) {
+        if (pageable.getPageNumber() < 0){
+            throw new IllegalArgumentException("page không được âm");
+        }
+        if (pageable.getPageSize() > 100){
+            throw new IllegalArgumentException("size không được > 100");
+        }
+
+        Page<Product> page = repository.findAll(pageable);
+
+        List<ProductResponse> content = page.getContent()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
+
+        return new PageResponse<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
+        );
     }
 
     public ProductResponse getById(Long id){
@@ -92,11 +107,20 @@ public class ProductsService {
         repository.deleteById(id);
     }
 
-    public List<ProductResponse> search(String keyword, BigDecimal minPrice, BigDecimal maxPrice){
-        return repository.findByNameContainingIgnoreCaseAndPriceBetween(keyword, minPrice,maxPrice)
+    public PageResponse<ProductResponse> search(String keyword, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable){
+
+        Page<Product> page = repository.findByNameContainingIgnoreCaseAndPriceBetween( keyword,minPrice, maxPrice,pageable);
+        List<ProductResponse> content = page.getContent()
                 .stream()
                 .map(mapper::toResponse)
                 .toList();
+        return new PageResponse<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
+        );
     }
 
     public List<ProductResponse> searchByName(String keyword){
@@ -148,11 +172,19 @@ public class ProductsService {
         return repository.existsByName(name);
     }
 
-    public List<ProductResponse> getByCategory(Long categoryId){
-        return repository.findByCategoryId(categoryId)
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
+    public PageResponse<ProductResponse> getByCategory(Long categoryId, Pageable pageable){
+        Page<Product> page = repository.findByCategoryId(categoryId,pageable);
+        List<ProductResponse> content = page.getContent()
+                .stream().map(mapper::toResponse).toList();
+        return new PageResponse<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
+        );
+
+
     }
     //  Đếm sản phẩm theo categoryId
     public Long countByCategoryId(Long categoryId){

@@ -1,6 +1,8 @@
 package com.example.shop_api.repository;
 
 import com.example.shop_api.entity.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,6 +26,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // 5. Tìm sản phẩm theo categoryId
     List<Product> findByCategoryId(Long categoryId);
+    Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
 
     // 6. Đếm sản phẩm theo categoryId
     long countByCategoryId(Long categoryId);
@@ -38,8 +41,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByName(String name);
 
     //name chứa keyword, không phân biệt hoa thường và price nằm trong khoảng minPrice → maxPrice
-    List<Product> findByNameContainingIgnoreCaseAndPriceBetween(
-            String keyword, BigDecimal minPrice, BigDecimal maxPrice);
+    Page<Product> findByNameContainingIgnoreCaseAndPriceBetween(
+            String keyword, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
 
     // theo từ khóa tên
     List<Product> findByNameContainingIgnoreCase(String keyword);

@@ -35,6 +35,17 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e, HttpServletRequest request){
+        ErrorResponse body = new ErrorResponse(
+                LocalDateTime.now(),
+                404,
+                "Illegal_Argument",
+                e.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
 
 
     // =========================

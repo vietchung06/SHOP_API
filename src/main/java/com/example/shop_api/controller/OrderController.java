@@ -3,12 +3,13 @@ package com.example.shop_api.controller;
 import com.example.shop_api.JPA.entity.OrderEntity;
 import com.example.shop_api.dto.OrderRequest;
 import com.example.shop_api.dto.OrderResponse;
+import com.example.shop_api.dto.PageResponse;
 import com.example.shop_api.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Map;
 
@@ -22,8 +23,8 @@ public class OrderController {
         this.orderService = orderService;
     }
     @GetMapping("/orders")
-    public ResponseEntity<List<OrderResponse>> getAll(){
-        List<OrderResponse> order = orderService.getAll();
+    public ResponseEntity<PageResponse<OrderResponse>> getAll(Pageable pageable){
+        PageResponse<OrderResponse> order = orderService.getAll(pageable);
         return ResponseEntity.ok(order);
     }
     //lấy đơn hàng của một khách

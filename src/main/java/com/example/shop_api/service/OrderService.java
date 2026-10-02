@@ -5,10 +5,7 @@ import com.example.shop_api.JPA.entity.OrderEntity;
 import com.example.shop_api.JPA.entity.OrderItemEntity;
 import com.example.shop_api.JPA.entity.OrderStatus;
 import com.example.shop_api.NotificationSender;
-import com.example.shop_api.dto.OrderItemRequest;
-import com.example.shop_api.dto.OrderItemResponse;
-import com.example.shop_api.dto.OrderRequest;
-import com.example.shop_api.dto.OrderResponse;
+import com.example.shop_api.dto.*;
 import com.example.shop_api.entity.Product;
 import com.example.shop_api.exception.CustomerNotFoundException;
 import com.example.shop_api.exception.InsufficientStockException;
@@ -20,6 +17,8 @@ import com.example.shop_api.repository.OrderRepository;
 import com.example.shop_api.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -42,13 +41,20 @@ public class OrderService {
         this.orderMapper = orderMapper;
     }
 
-    public List<OrderResponse> getAll(){
-        List<OrderEntity> order = repository.findAll();
-        List<OrderResponse> result = new ArrayList<>();
-        for (OrderEntity order1 : order){
-            result.add(orderMapper.toResponse(order1));
-        }
-        return result;
+    public PageResponse<OrderResponse> getAll(Pageable pageable){
+        Page<OrderEntity> page = repository.findAll(pageable);
+        List<OrderResponse> content = page.getContent()
+                .stream().map(orderMapper::toResponse).toList();
+
+        return new PageResponse<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
+        );
+
+
     }
 
     //  //Tìm đơn hàng theo id khách hàng

@@ -106,6 +106,28 @@ public class DataSeeder implements CommandLineRunner {
 //            System.out.println(productByNameCategory.getCategory().getFullName() + "-" + productByNameCategory.getName() + " - " + productByNameCategory.getPrice());
 //        }
 
+
+        if (repository.count() == 29) {
+
+            CategoryEntity category = categorysRepository.findById(28L)
+                    .orElseThrow();
+
+            for (int i = 1; i <= 50; i++) {
+
+                Product product = Product.builder()
+                        .name("Sản phẩm " + i)
+                        .price(BigDecimal.valueOf(100000 + i * 10000))
+                        .quantity(10 + i)
+                        .description("Mô tả sản phẩm " + i)
+                        .brand("Brand " + i)
+                        .status(ProductStatus.ACTIVE)
+                        .category(category)
+                        .build();
+
+                repository.save(product);
+            }
+        }
+
         // ==============================
         // CÁCH 1: BỊ N+1
         // ==============================
